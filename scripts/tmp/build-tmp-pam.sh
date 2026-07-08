@@ -1,0 +1,12 @@
+#!/bin/bash
+rpmbuild -bp ~/rpmbuild/SPECS/pam.spec --nodeps
+pushd ${RPMBUILD}/pam-1.6.1-build/Linux-PAM-1.6.1/
+./configure ${COMMON_HOST_PREFIX_LIB} \
+	    --includedir=/tools/include/security \
+	    --disable-static \
+	    --enable-openssl
+make ${JOBS}
+make install
+chmod -v 4755 /tools/sbin/unix_chkpwd
+popd
+

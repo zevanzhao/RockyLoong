@@ -1,0 +1,19 @@
+#!/bin/bash
+#build kernel 6.17.11
+pushd ${BUILDDIR}/linux-source-6.17
+make mrproper
+cp -v ${DOWNLOADDIR}/config-6.17.11 .config
+PATH=/bin:$PATH make ARCH=loongarch CROSS_COMPILE=${CROSS_TARGET}- menuconfig
+echo "Press enter to continue with kernel or Ctrl-C to cancel"
+read
+make ARCH=loongarch CROSS_COMPILE=${CROSS_TARGET}- $JOBS
+make ARCH=loongarch CROSS_COMPILE=${CROSS_TARGET}- INSTALL_MOD_PATH=/tools/ modules_install
+mkdir -pv /tools/boot/
+#copy the files
+cp -v arch/loongarch/boot/vmlinuz.efi /tools/boot/vmlinuz-6.17.11-loong64
+cp -v .config /tools/boot/config-6.17.11-loong64
+#make a link
+pushd /tools/boot
+ln -sfv vmlinuz-6.17.11-loong64 vmlinuz
+popd
+popd
