@@ -542,130 +542,134 @@ Please report to bug-grub@gnu.org
 
 ## 制作环境设置 
 
-更新.bashrc，创建meson-cross.txt
+更新.bashrc，创建meson-cross.txt。可以参考这个[脚本](scripts/tmp/prepare-tmp-os.sh)
 
-zlib 需要从这里下载
-
-<https://mirror.nju.edu.cn/rocky/9/devel/source/tree/Packages/z/zip-3.0-35.el9.src.rpm>
-
-临时系统工具链构建
+接着，完成临时系统工具链构建。每个软件包的构建脚本，在[脚本目录](scripts/tmp/)中。
 
 ## gmp
 
-检查：
-
-/tools/lib64文件夹下，存在libgmp.a,libgmp.so文件。
+检查：/tools/lib64文件夹下，存在libgmp.a,libgmp.so文件。
 
 ## MPFR
 
 检查：在/tools/lib64文件夹下，存在libmpfr.so, libmpfr.a文件
 
-## MPC {#mpc .unnumbered}
+## MPC 
 
 检查：在/tools/lib64文件夹下，存在libmpc.so, libmpc.a文件
 
-## ISL {#isl-1 .unnumbered}
+## ISL 
 
 ISL是gcc的一部分。
 
 检查：在/tools/lib64文件夹下，存在libisl.so, libisl.a文件
 
-## CLooG {#cloog-1 .unnumbered}
+## CLooG
 
 新版本的GCC不再需要了CLooG了。
 
-## Zlib 检查：在/tools/lib64文件夹下，存在libz.so, libz.a文件 {#zlib-检查在toolslib64文件夹下存在libz.so-libz.a文件 .unnumbered}
+## Zlib
 
-## Binutils {#binutils .unnumbered}
+zlib 需要从这里下载
+
+<https://mirror.nju.edu.cn/rocky/9/devel/source/tree/Packages/z/zip-3.0-35.el9.src.rpm>
+
+检查：在/tools/lib64文件夹下，存在libz.so, libz.a文件
+
+## Binutils 
 
 检查：/tools/bin目录下，存在ld, nm, as, ld-new等程序。
 
 检查interpreter
-
+```bash
 file /tools/bin/ld
+```
 
+输出为
+```text
 /tools/bin/ld: ELF 64-bit LSB pie executable, LoongArch, version 1
 (SYSV), dynamically linked, interpreter
 /tools/lib64/ld-linux-loongarch-lp64d.so.1, for GNU/Linux 5.19.0, with
 debug_info, not stripped
-
+```
 检查搜索路径：
+```bash
+tools/bin/ld --verbose|grep -i search
+```
+输出为
+```text
+SEARCH_DIR("/tools/loongarch64-unknown-linux-gnu/lib64"); SEARCH_DIR("/tools/lib64"); SEARCH_DIR("/tools/lib"); SEARCH_DIR("/tools/loongarch64-unknown-linux-gnu/lib");
+```
 
-tools/bin/ld \--verbose\|grep -i search
-
-SEARCH_DIR(\"/tools/loongarch64-unknown-linux-gnu/lib64\");
-SEARCH_DIR(\"/tools/lib64\"); SEARCH_DIR(\"/tools/lib\");
-SEARCH_DIR(\"/tools/loongarch64-unknown-linux-gnu/lib\");
-
-## GCC {#gcc .unnumbered}
+## GCC
 
 重要的组件。
 
 检查：在/tools/bin/中，存在gcc, g++, gfortran, cpp等文件。
 
 检查interpreter
-
+```bash
 file /tools/bin/gcc
+```
 
+输出：
+```text
 /tools/bin/gcc: ELF 64-bit LSB executable, LoongArch, version 1
 (GNU/Linux), dynamically linked, interpreter
 /tools/lib64/ld-linux-loongarch-lp64d.so.1, for GNU/Linux 5.19.0, with
 debug_info, not stripped
+```
+## ncurses
 
-## ncurses  {#ncurses .unnumbered}
+编译之前，修改SPEC文件，注释掉这一行:
+```bash
+%{gpgverify} --keyring=%{SOURCE2} --signature=%{SOURCE1} --data=%{SOURCE0} 
+```
+gpgverify 这个宏暂时没有实现，跳过这个也没有关系。
 
-1.  修改SPEC文件，注释掉这一行:
-
-    #%{gpgverify} \--keyring=%{SOURCE2} \--signature=%{SOURCE1}
-    \--data=%{SOURCE0}
-
-    看起来是这个版本的RPM不认识这个参数%{gpgverify}。不管了，先注释掉。
-
-    <https://fedoraproject.org/wiki/Changes/Fix_limitations_in_gpgverify>
-
-    检查：
+检查：
 
 在/tools/lib64/下，存在libncurses.so, libncursesw.a
 libncursesw.so等库文件。
 
-/tools/lib64/pkgconfig 目录下存在ncurses++w.pc
-ncursesw.pc，ncurses.pc文件。
+/tools/lib64/pkgconfig 目录下存在ncurses++w.pc，ncursesw.pc，ncurses.pc文件。
 
-## BZIP2 {#bzip2 .unnumbered}
+## BZIP2 
 
 检查：/tools/bin下，存在bzip2，bunzip2, bcat, bzmore, bzless,
 bzgrep等文件。
 
 在/tools/lib64下，存在 libbz2.so。
 
-## XZ {#xz .unnumbered}
+## XZ 
 
 检查：
-
-ls /tools/bin/xz\*
-
+```bash 
+ls /tools/bin/xz* /tools/lib64/liblzma.*
+```
+输出：
+```text 
 /tools/bin/xz /tools/bin/xzcmp /tools/bin/xzdiff /tools/bin/xzfgrep
 /tools/bin/xzless /tools/bin/xzcat /tools/bin/xzdec /tools/bin/xzegrep
 /tools/bin/xzgrep /tools/bin/xzmore
-
-ls /tools/lib64/liblzma.\*
-
 /tools/lib64/liblzma.a /tools/lib64/liblzma.la /tools/lib64/liblzma.so
 /tools/lib64/liblzma.so.5 /tools/lib64/liblzma.so.5.6.2
+```
 
-## Readline {#readline .unnumbered}
+## Readline
 
 检查：
-
-ls /tools/lib64/libreadline.\* /tools/lib64/libhistory.\*
-
+``` bash
+ls /tools/lib64/libreadline.* /tools/lib64/libhistory.*
+```
+输出：
+```text
 /tools/lib64/libhistory.a /tools/lib64/libhistory.so.8
 /tools/lib64/libreadline.a /tools/lib64/libreadline.so.8
-
 /tools/lib64/libhistory.so /tools/lib64/libhistory.so.8.2
 /tools/lib64/libreadline.so /tools/lib64/libreadline.so.8.2
-
-## OpenSSL {#openssl .unnumbered}
+```
+## OpenSSL
 
 编译openssl的时候，遇到了这个bug
 
@@ -673,409 +677,541 @@ ls /tools/lib64/libreadline.\* /tools/lib64/libhistory.\*
 
 看起来与某些宏定义有关。暂时先注释掉一些代码，编译可以正常进行。至于这是什么原理，以后再考虑了。
 
-与这个补丁有关系，去掉这个补丁应该就可以了。
-
-0014-RH-Export-two-symbols-for-OPENSSL_str-n-casecmp.patch
+似乎与这个补丁有关系: `0014-RH-Export-two-symbols-for-OPENSSL_str-n-casecmp.patch`
 
 并没有那么简单。最后的办法：写了sed语句，注释掉一部分代码
 
 检查：
-
+```bash
 ls /tools/bin/openssl
-
+```
+输出：
+```text
 /tools/bin/openssl
+```
 
+```bash
 file /tools/bin/openssl
+```
 
+输出：
+```text
 /tools/bin/openssl: ELF 64-bit LSB pie executable, LoongArch, version 1
 (SYSV), dynamically linked, interpreter
 /tools/lib64/ld-linux-loongarch-lp64d.so.1, for GNU/Linux 5.19.0, with
 debug_info, not stripped
+```
 
-ls /tools/lib64/libssl.\*
-
+```bash
+ls /tools/lib64/libssl.*
+```
+输出：
+```text
 /tools/lib64/libssl.a /tools/lib64/libssl.so /tools/lib64/libssl.so.
-
-## pcre2 {#pcre2 .unnumbered}
+```
+## pcre2
 
 注释掉spec文件中的gpgverify行。
 
 检查：
-
-ls /tools/lib64/libpcre2-\*
-
+```bash
+ls /tools/lib64/libpcre2-*
+```
+输出：
+```text
 /tools/lib64/libpcre2-8.a /tools/lib64/libpcre2-8.so.0
 /tools/lib64/libpcre2-posix.la /tools/lib64/libpcre2-posix.so.3.0.5
-
 /tools/lib64/libpcre2-8.la /tools/lib64/libpcre2-8.so.0.13.0
 /tools/lib64/libpcre2-posix.so
-
 /tools/lib64/libpcre2-8.so /tools/lib64/libpcre2-posix.a
 /tools/lib64/libpcre2-posix.so.3
+```
+## libsepol
 
-## libsepol {#libsepol .unnumbered}
-
-检查：ls /tools/lib64/libsepol.\*
-
+检查：
+```bash
+ls /tools/lib64/libsepol.*
+```
+输出：
+```text
 /tools/lib64/libsepol.a /tools/lib64/libsepol.so
 /tools/lib64/libsepol.so.2
+```
+## libselinux 
 
-## libselinux  {#libselinux .unnumbered}
-
-必须设置PKG_CONFIG_PATH=/tools/lib64/pkgconfig USE_PCRE2=y
+必须设置`PKG_CONFIG_PATH=/tools/lib64/pkgconfig USE_PCRE2=y`
 
 否则不会自动链接pcre2-8。
 
-检查：ls /tools/lib64/libselinux.\*
-
+检查：
+```bash
+ls /tools/lib64/libselinux.*
+```
+输出：
+```text
 /tools/lib64/libselinux.a /tools/lib64/libselinux.so
 /tools/lib64/libselinux.so.1
-
-## nspr {#nspr .unnumbered}
+```
+## nspr
 
 nspr的源码在nss中。
 
 完成
 
 检查：
-
-ls /tools/lib64/{libnspr4.\*,libplc\*}
-
+```bash
+ls /tools/lib64/{libnspr4.*,libplc*}
+```
+输出：
+```text
 /tools/lib64/libnspr4.a /tools/lib64/libnspr4.so /tools/lib64/libplc4.a
 /tools/lib64/libplc4.so
-
-## sqlite {#sqlite .unnumbered}
+```
+## sqlite
 
 完成
 
 检查：
-
-ls /tools/lib64/libsqlite3.\*
-
+```bash
+ls /tools/lib64/libsqlite3.*
+```
+输出：
+```text
 /tools/lib64/libsqlite3.a /tools/lib64/libsqlite3.la
 /tools/lib64/libsqlite3.so /tools/lib64/libsqlite3.so.0
 /tools/lib64/libsqlite3.so.0.8.6
+```
+## nss 
 
-## nss {#nss .unnumbered}
-
-需要添加 NSS_DISABLE_DSA=1 NSS_ENABLE_ML_DSA=1
+需要添加 `NSS_DISABLE_DSA=1 NSS_ENABLE_ML_DSA=1`
 
 完成
 
 检查：
-
-ls /tools/lib64/{libnss\*,libsoft\*}
-
+```bash
+ls /tools/lib64/{libnss*,libsoft*}
+```
+输出：
+```text
 /tools/lib64/libnss3.so /tools/lib64/libnss_db.so.2
 /tools/lib64/libnss_hesiod.so.2 /tools/lib64/libnsssysinit.so
-
 /tools/lib64/libnss_compat.so /tools/lib64/libnss_dns.so.2
 /tools/lib64/libnssckbi-testlib.so /tools/lib64/libnssutil3.so
-
 /tools/lib64/libnss_compat.so.2 /tools/lib64/libnss_files.so.2
 /tools/lib64/libnssckbi.so /tools/lib64/libsoftokn3.so
-
 /tools/lib64/libnss_db.so /tools/lib64/libnss_hesiod.so
 /tools/lib64/libnssdbm3.so
-
-## popt {#popt .unnumbered}
+```
+## popt
 
 完成
 
-检查：ls /tools/lib64/libpopt.\*
+检查：
+```bash
+ls /tools/lib64/libpopt.*
+```
 
+输出：
+```text
 /tools/lib64/libpopt.a /tools/lib64/libpopt.la /tools/lib64/libpopt.so
 /tools/lib64/libpopt.so.0 /tools/lib64/libpopt.so.0.0.2
-
-## libarchive {#libarchive .unnumbered}
+```
+## libarchive
 
 需要修改aclocal.m4和configure脚本，因为系统中的aclocal版本是1.18,不是1.16。
 
-这个修改写到编译脚本内。
+我采用的方法是将这个修改写到编译脚本内。也可以尝试用`autoconf -fiv`个更新一下脚本。
 
 检查：
+```bash
+ls /tools/lib64/libarchive.*
+```
 
-ls /tools/lib64/libarchive.\*
-
+输出：
+```text
 /tools/lib64/libarchive.a /tools/lib64/libarchive.so
 /tools/lib64/libarchive.so.13.7.7
 
 /tools/lib64/libarchive.la /tools/lib64/libarchive.so.13
-
-## libdb {#libdb .unnumbered}
+```
+## libdb
 
 rocky 10已经不提供libdb包了。不需要了。
 
-## libcap {#libcap .unnumbered}
+## libcap
 
 注释掉gpgverify相关的语句。完成。
 
-检查：ls /tools/lib64/libcap.\*
+检查：
+```bash
+ls /tools/lib64/libcap.*
+```
 
+输出：
+```text
 /tools/lib64/libcap.a /tools/lib64/libcap.so /tools/lib64/libcap.so.2
 /tools/lib64/libcap.so.2.69
-
-## libmicrohttpd {#libmicrohttpd .unnumbered}
+```
+## libmicrohttpd
 
 完成。
 
-检查：ls /tools/lib64/libmicrohttpd.\*
+检查：
+```bash
+ls /tools/lib64/libmicrohttpd.*
+```
 
+输出：
+```text
 /tools/lib64/libmicrohttpd.a /tools/lib64/libmicrohttpd.so
 /tools/lib64/libmicrohttpd.so.12.62.0
-
 /tools/lib64/libmicrohttpd.la /tools/lib64/libmicrohttpd.so.12
-
-## libpsl {#libpsl .unnumbered}
+```
+## libpsl
 
 curl依赖libpsl,所以需要先编译psl。
 
 注释掉了spec文件中的%py3_shebang_fix 相关的语句
 
-检查：ls /tools/lib64/libpsl.\*
-
+检查：
+```bash
+ls /tools/lib64/libpsl.*
+```
+输出：
+```text
 /tools/lib64/libpsl.a /tools/lib64/libpsl.la /tools/lib64/libpsl.so
 /tools/lib64/libpsl.so.5 /tools/lib64/libpsl.so.5.3.5
-
+```
 ## curl {#curl .unnumbered}
 
 注释掉%{gpgverify}相关语句
 
-需要设置使用的ssl。
+检查
+```bash
+file /tools/bin/curl
+```
 
-ls /tools/bin/curl
-
-/tools/bin/curl
-
-rocky@debian:\~/scripts/tmp\$ file /tools/bin/curl
-
+输出：
+```text
 /tools/bin/curl: ELF 64-bit LSB pie executable, LoongArch, version 1
 (SYSV), dynamically linked, interpreter
 /tools/lib64/ld-linux-loongarch-lp64d.so.1, for GNU/Linux 5.19.0, with
 debug_info, not stripped
+```
+```bash
+ls /tools/lib64/libcurl.*
+```
 
-rocky@debian:\~/scripts/tmp\$ ls /tools/lib64/libcurl.\*
-
+输出：
+```text
 /tools/lib64/libcurl.a /tools/lib64/libcurl.la /tools/lib64/libcurl.so
 /tools/lib64/libcurl.so.4 /tools/lib64/libcurl.so.4.8.0
-
-## elfutils {#elfutils .unnumbered}
+```
+## elfutils 
 
 完成
 
-检查：ls /tools/lib64/{libelf\*,libdw\*}
+检查：
+```bash
+ls /tools/lib64/{libelf*,libdw*}
+```
 
+输出：
+```text
 /tools/lib64/libdw-0.193.so /tools/lib64/libdw.so
 /tools/lib64/libelf-0.193.so /tools/lib64/libelf.so
-
 /tools/lib64/libdw.a /tools/lib64/libdw.so.1 /tools/lib64/libelf.a
 /tools/lib64/libelf.so.1
-
-## lz4 {#lz4 .unnumbered}
+```
+## lz4
 
 完成。
 
-检查：ls /tools/bin/lz4\* /tools/lib64/liblz4\*
+检查：
+```bash
+ls /tools/bin/lz4* /tools/lib64/liblz4*
+```
 
+输出：
+```text
 /tools/bin/lz4 /tools/bin/lz4cat /tools/lib64/liblz4.so
 /tools/lib64/liblz4.so.1.9.4
-
 /tools/bin/lz4c /tools/lib64/liblz4.a /tools/lib64/liblz4.so.1
+```
+## zstd 
 
-## zstd {#zstd .unnumbered}
+修改spec文件，%patchN 改为 %patch N
 
-修改spec文件，%patchN -\>%patch N
+检查：
+```bash
+ls /tools/bin/zstd* /tools/lib64/libzstd.*
+```
 
-检查：ls /tools/bin/zstd\* /tools/lib64/libzstd.\*
-
+输出：
+```text
 /tools/bin/zstd /tools/bin/zstdgrep /tools/bin/zstdmt
 /tools/lib64/libzstd.so /tools/lib64/libzstd.so.1.5.5
-
 /tools/bin/zstdcat /tools/bin/zstdless /tools/lib64/libzstd.a
 /tools/lib64/libzstd.so.1
+```
 
-## expat {#expat .unnumbered}
+## expat
 
 注释掉%{gpgverify}相关语句
 
-configure的时候添加\--without-docbook
+configure的时候添加 `--without-docbook`
 
 编译的时候会出错。应该想办法跳过doc
 
 修改Makefile.in
 
-检查：ls /tools/lib64/libexpat.\*
+检查：
+```bash
+ls /tools/lib64/libexpat.*
+```
 
+输出：
+```text
 /tools/lib64/libexpat.a /tools/lib64/libexpat.la
 /tools/lib64/libexpat.so /tools/lib64/libexpat.so.1
 /tools/lib64/libexpat.so.1.10.2
+```
 
-## bash  {#bash .unnumbered}
+## bash
 
 完成
 
-检查： ls /tools/bin/bash
+检查：
+```bash
+ ls /tools/bin/bash
+```
 
+输出：
+```text
 /tools/bin/bash
-
-## bash-complete {#bash-complete .unnumbered}
-
-完成
-
-## coreutils {#coreutils .unnumbered}
+```
+## bash-complete 
 
 完成
 
-检查：ls /tools/bin/{ls,cp,hostname,wc,tail,uniq}
+## coreutils
+完成
 
+检查：
+```bash
+ls /tools/bin/{ls,cp,hostname,wc,tail,uniq}
+```
+
+输出：
+```text
 /tools/bin/cp /tools/bin/hostname /tools/bin/ls /tools/bin/tail
 /tools/bin/uniq /tools/bin/wc
-
-## file {#file .unnumbered}
+```
+## file
 
 再一次遇到了gpgverify的问题。准备一劳永逸解决问题。
 
-安装redhat-rpm-config-293这个源码包，将gpgverify脚本放在
-/usr/lib/rpm/redhat,将macros.fedora-misc放在/usr/lib/rpm/macros.d。
+安装`redhat-rpm-config-293`这个源码包，将gpgverify脚本放在
+`/usr/lib/rpm/redhat`,将`macros.fedora-misc`放在`/usr/lib/rpm/macros.d`。
 
 gpgverify脚本需要gpgv2，简单做个符号链接：
-
+```bash
 ln -s gpgv gpgv2
+```
 
-检查：ls /tools/bin/file
+检查：
+```bash
+ls /tools/bin/file
+```
 
+输出：
+```text
 /tools/bin/file
-
-## findutils {#findutils .unnumbered}
+```
+## findutils
 
 完成
 
-检查：ls /tools/bin/find
+检查：
+```bash
+ls /tools/bin/find
+```
 
+输出：
+```text
 /tools/bin/find
-
-## gawk {#gawk .unnumbered}
+```
+## gawk
 
 需要设置automake的版本。
 
 完成
 
-检查：ls /tools/bin/gawk
+检查：
+```bash
+ls /tools/bin/gawk
+```
 
+输出：
+```text
 /tools/bin/gawk
+```
+## gettext
 
-## gettext  {#gettext .unnumbered}
-
-只需要添加 sed -e \'s/\\(gl_cv_libxml_force_included=\\)no/\\1yes/\' -i
-libtextstyle/configure
-
+只需要添加
+```bash
+sed -e 's/\(gl_cv_libxml_force_included=\)no/\1yes/' -i libtextstyle/configure
+```
 即可。完成。
 
-检查：ls /tools/bin/{gettext,msg\*}
+检查：
+```bash
+ls /tools/bin/{gettext,msg*}
+```
 
+输出：
+```text
 /tools/bin/gettext /tools/bin/msgcmp /tools/bin/msgen /tools/bin/msgfmt
 /tools/bin/msgmerge
-
 /tools/bin/msgattrib /tools/bin/msgcomm /tools/bin/msgexec
 /tools/bin/msggrep /tools/bin/msgunfmt
-
 /tools/bin/msgcat /tools/bin/msgconv /tools/bin/msgfilter
 /tools/bin/msginit /tools/bin/msguniq
-
-## grep {#grep .unnumbered}
+```
+## grep
 
 需要设置automake的版本
 
 完成
 
 检查：
-
+```bash
 ls /tools/bin/grep
+```
 
+输出：
+```text
 /tools/bin/grep
-
-## gzip {#gzip .unnumbered}
+```
+## gzip
 
 完成。
 
-检查：ls /tools/bin/gz\*
+检查：
+```bash
+ls /tools/bin/gz*
+```
 
+输出：
+```text
 /tools/bin/gzexe /tools/bin/gzip
-
-## sed {#sed .unnumbered}
+```
+## sed 
 
 完成
 
-检查：ls /tools/bin/sed
+检查：
+```bash
+ls /tools/bin/sed
+```
 
+输出：
+```text
 /tools/bin/sed
-
-## util-linux {#util-linux .unnumbered}
+```
+## util-linux
 
 设置PKG_CONFIG_PATH, 运行autoreconf -fv
 
-编译过程中会报错，因此添加了\--disable-schedutils
+编译过程中会报错，因此添加了--disable-schedutils
 不知道是否会有不好的影响。
 
 完成。
 
-检查：ls /tools/bin/{mount,umou\*}
+检查：
+```bash
+ls /tools/bin/{mount,umou*}
+```
 
+输出：
+```text
 /tools/bin/mount /tools/bin/umount
-
-## kmod  {#kmod .unnumbered}
+```
+## kmod
 
 需要设置PKG_CONFIG_PATH,并且运行autoreconf -fv
 
 完成。
 
-检查：ls /tools/bin/\*mod
+检查：
+```bash
+ls /tools/bin/*mod
+```
 
+输出：
+```text
 /tools/bin/chmod /tools/bin/depmod /tools/bin/insmod /tools/bin/kmod
 /tools/bin/lsmod /tools/bin/rmmod
-
-## vim {#vim .unnumbered}
+```
+## vim
 
 完成。参考了书和CLFS的文档。
 
-一点点区别：我设置了set mouse=a
+一点点区别：我设置了`set mouse=a`
 
-检查：ls /tools/bin/vi\*
+检查：
+```bash
+ls /tools/bin/vi*
+```
 
+输出：
+```text
 /tools/bin/vi /tools/bin/view /tools/bin/vim /tools/bin/vimdiff
 /tools/bin/vimtutor
-
-## nano  {#nano .unnumbered}
+```
+## nano
 
 虽然编译通过了，但我总觉得不太合理。
 
-configure的时候，添加了一些参数：
+configure的时候，添加了一些参数：`LIBS="-lncurses -ltinfo" LDFLAGS="-L/tools/lib64"`
+检查：
+```bash
+ls /tools/bin/nano
+```
 
-LIBS=\"-lncurses -ltinfo\" LDFLAGS=\"-L/tools/lib64\"
-
-检查：ls /tools/bin/nano
-
+输出：
+```text
 /tools/bin/nano
-
-## which {#which .unnumbered}
+```
+## which
 
 完成。
 
-检查：ls /tools/bin/which
+检查：
+```bash
+ls /tools/bin/which
+```
 
+输出：
+```text
 /tools/bin/which
+```
+## iproute
 
-## iproute {#iproute .unnumbered}
-
-设置了LIBDIR=/tools/lib64/
+设置了`LIBDIR=/tools/lib64/`
 
 完成。
 
-检查： ls /tools/sbin/{ifstat,ip}
+检查： 
+```bash
+ls /tools/sbin/{ifstat,ip}
+```
 
+输出：
+```text
 /tools/sbin/ifstat /tools/sbin/ip
-
-## dhcpcd {#dhcpcd .unnumbered}
+```
+## dhcpcd
 
 完成。
 
