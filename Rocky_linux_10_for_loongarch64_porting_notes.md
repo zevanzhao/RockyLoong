@@ -3182,15 +3182,11 @@ Installed (but unpackaged) file(s) found:
 
 cmake依赖vim-filesystem。
 
-手动添加了vimfiles_root宏的定义，
+手动添加了vimfiles_root宏的定义: `--define "vimfiles_root %{_datadir}/vim/vimfiles/"`
 
-\--define \"vimfiles_root %{\_datadir}/vim/vimfiles/\"
+遇到未打包的文件，不要终止，添加语句：`--define '_unpackaged_files_terminate_build 0'`
 
-遇到未打包的文件，不要终止，添加语句：
-
-\--define \'\_unpackaged_files_terminate_build 0\'
-
-test需要花很长的时间，如果通不过，就加上\--nocheck
+test需要花很长的时间，如果通不过，就加上`--nocheck`
 
 ## Hostname 
 
@@ -3198,7 +3194,7 @@ test需要花很长的时间，如果通不过，就加上\--nocheck
 
 ## Coreutils 
 
-注释掉spec中的gpg校验部分。有两个案例会fail， 不管了。加上nocheck。
+注释掉spec中的gpg校验部分。有两个案例会fail， 不管了。加上`--nocheck`。
 
 coreutils-single和coreutils两个包冲突，前者不装了。
 
@@ -3214,7 +3210,7 @@ python-packaging，都需要编译安装。
 
 ## Re2c 
 
-没有找到源码，不知道它
+没有找到源码,不编译。
 
 ## Ninja-build 
 
@@ -3223,10 +3219,9 @@ python-packaging，都需要编译安装。
 ## Meson 
 
 遇到了version_no_tilde的宏。直接定义一下。
-
-rpmbuild \--rebuild /opt/srpms/Packages/meson-1.4.1-4.el10.src.rpm
-\--define \" version_no_tilde 1.4.1\"
-
+```bash
+rpmbuild --rebuild /opt/srpms/Packages/meson-1.4.1-4.el10.src.rpm --define " version_no_tilde 1.4.1"
+```
 将macros.meson复制到/tools/lib/rpm/
 
 ## Dos2unix 
@@ -3235,7 +3230,7 @@ rpmbuild \--rebuild /opt/srpms/Packages/meson-1.4.1-4.el10.src.rpm
 
 ## Swig 
 
-添加\--without testsuite参数
+添加`--without testsuite`参数
 
 ## Less 
 
@@ -3254,13 +3249,12 @@ rpmbuild \--rebuild /opt/srpms/Packages/meson-1.4.1-4.el10.src.rpm
 按照书中的写法，修改spec文件。
 
 因为后续的编译中，需要用chrpath来做一些检查，我们需要跳过这些检查。
-
-rpmbuild -ba \~/rpmbuild/SPECS/chrpath.spec \--define
-\'\_unpackaged_files_terminate_build 0\'
-
+```bash
+rpmbuild -ba ~/rpmbuild/SPECS/chrpath.spec --define '_unpackaged_files_terminate_build 0'
+```
 ## Psutils 
 
-测试通不过。加上\--nocheck。
+测试通不过。加上`--nocheck`。
 
 ## libedit 
 
@@ -3273,10 +3267,9 @@ rpmbuild -ba \~/rpmbuild/SPECS/chrpath.spec \--define
 ## llvm 
 
 遇到这样的报错：
-
-错误：lua 脚本执行失败：\[string \"python_provide\"\]:2: module
-\'fedora.srpm.python\' not found:
-
+```text
+错误：lua 脚本执行失败：[string "python_provide"]:2: module 'fedora.srpm.python' not found:
+```
 需要重新编安装python-rpm-macros。
 
 ## python-lit 
@@ -3285,7 +3278,7 @@ rpmbuild -ba \~/rpmbuild/SPECS/chrpath.spec \--define
 
 ## clang 
 
-[和llvm相关，先跳过。]{.mark}
+和llvm相关，先跳过。
 
 ## ccache 
 
@@ -3307,13 +3300,13 @@ rpmbuild -ba \~/rpmbuild/SPECS/chrpath.spec \--define
 
 正常编译即可。
 
-## 图形相关软件包 {#图形相关软件包 .unnumbered}
 
 ## giflib 
+开始编译图形相关软件包。
 
-这个包依赖mingw64-gcc, mingw64-filesystem
+giflib这个包依赖mingw64-gcc, mingw64-filesystem
 
-做一个完全不依赖mingw的版本。
+修改spec文件，做一个完全不依赖mingw的版本。
 
 ## libpng 
 
@@ -3381,17 +3374,16 @@ rpmbuild -ba \~/rpmbuild/SPECS/chrpath.spec \--define
 
 ## forge-srpm-macros 
 
-打包的时候加上\--nocheck
-
-rpmbuild \--rebuild
-/opt/srpms/Packages/forge-srpm-macros-0.4.0-6.el10.src.rpm \--nodeps
-\--nocheck
-
+打包的时候加上`--nocheck`
+编译脚本：
+```bash
+rpmbuild --rebuild /opt/srpms/Packages/forge-srpm-macros-0.4.0-6.el10.src.rpm --nodeps --nocheck
+```
 ## fonts-rpm-macros 
 
 依赖forge-srpm-macros，顺便安装了。
 
-把安装的宏定义文件，复制到/tools/lib/rpm/macrod.d/
+把安装的宏定义文件，复制到`/tools/lib/rpm/macrod.d/`
 
 ## fontconfig 
 
@@ -3411,7 +3403,7 @@ rpmbuild \--rebuild
 
 ## libSM 
 
-修改spec文件，将\--with-libuuid, 改为\--without-libuuid
+修改spec文件，将`--with-libuuid`, 改为`--without-libuuid`
 
 ## libXrender 
 
@@ -3471,188 +3463,98 @@ rpmbuild \--rebuild
 
 ## glib2 
 
-依赖g-ir-scanner，尝试编译安装gobject-introspection。gobject-introspection也依赖glib2。出现循环依赖了。给meson添加-Dintrospection=disabled
+依赖g-ir-scanner，尝试编译安装gobject-introspection。gobject-introspection也依赖glib2。出现循环依赖了。给meson添加`-Dintrospection=disabled`
 参数。
 
-依赖sysprof-capture-4，尝试满足，又是一个循环依赖。继续破除依赖。
+依赖sysprof-capture-4，尝试满足，又是一个循环依赖。继续破除依赖： `-Dsysprof=disabled`
 
--Dsysprof=disabled
+依赖libelf，继续添加 `-Dlibelf=disabled`
 
-依赖libelf，继续添加
-
--Dlibelf=disabled
-
-还依赖rst2man, 需要python3-docutils，继续破除依赖。
-
--Dman-pages=disabled
+还依赖rst2man, 需要python3-docutils，继续破除依赖`-Dman-pages=disabled`
 
 还是缺少一些东西，缺了marshalparser,补上。另外补充了python-pip,
 python-wheels包。
 
 check的时候有几个报错：
-
-16/375 glib:glib+core+slow / gdatetime ERROR 0.01s killed by signal 6
-SIGABRT
-
-22/375 glib:glib+core / hmac ERROR 0.01s killed by signal 5 SIGTRAP
-
-109/375 glib:glib+core / autoptr ERROR 0.01s killed by signal 5 SIGTRAP
-
-217/375 glib:gio / contenttype ERROR 0.01s killed by signal 6 SIGABRT
-
-282/375 glib:gio / file ERROR 0.04s killed by signal 5 SIGTRAP
-
-304/375 glib:gio / desktop-app-info ERROR 0.01s killed by signal 5
-SIGTRAP
-
-这些报错倒是可以理解。添加\--nocheck
+```text
+ 16/375 glib:glib+core+slow / gdatetime                                        ERROR            0.01s   killed by signal 6 SIGABRT
+ 22/375 glib:glib+core / hmac                                                  ERROR            0.01s   killed by signal 5 SIGTRAP
+109/375 glib:glib+core / autoptr                                               ERROR            0.01s   killed by signal 5 SIGTRAP
+217/375 glib:gio / contenttype                                                 ERROR            0.01s   killed by signal 6 SIGABRT
+282/375 glib:gio / file                                                        ERROR            0.04s   killed by signal 5 SIGTRAP
+304/375 glib:gio / desktop-app-info                                            ERROR            0.01s   killed by signal 5 SIGTRAP
+```
+这些报错倒是可以理解。添加`--nocheck`
 
 还有报错：
-
-Directory not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/lib64/girepository-1.0
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/lib64/girepository-1.0/GIRepository-3.0.typelib
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/lib64/girepository-1.0/GLib-2.0.typelib
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/lib64/girepository-1.0/GLibUnix-2.0.typelib
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/lib64/girepository-1.0/GModule-2.0.typelib
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/lib64/girepository-1.0/GObject-2.0.typelib
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/lib64/girepository-1.0/Gio-2.0.typelib
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/lib64/girepository-1.0/GioUnix-2.0.typelib
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/man/man1/gio.1\*
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/man/man1/gio-querymodules.1\*
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/man/man1/glib-compile-schemas.1\*
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/man/man1/gsettings.1\*
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/man/man1/gdbus.1\*
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/man/man1/gapplication.1\*
-
+```text
+ Directory not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/lib64/girepository-1.0
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/lib64/girepository-1.0/GIRepository-3.0.typelib
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/lib64/girepository-1.0/GLib-2.0.typelib
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/lib64/girepository-1.0/GLibUnix-2.0.typelib
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/lib64/girepository-1.0/GModule-2.0.typelib
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/lib64/girepository-1.0/GObject-2.0.typelib
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/lib64/girepository-1.0/Gio-2.0.typelib
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/lib64/girepository-1.0/GioUnix-2.0.typelib
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/man/man1/gio.1*
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/man/man1/gio-querymodules.1*
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/man/man1/glib-compile-schemas.1*
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/man/man1/gsettings.1*
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/man/man1/gdbus.1*
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/man/man1/gapplication.1*
+```
 继续修改spec文件，不要这些文件
 
 还有报错：
+```text
 
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/man/man1/glib-genmarshal.1\*
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/man/man1/glib-gettextize.1\*
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/man/man1/glib-mkenums.1\*
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/man/man1/gi-compile-repository.1\*
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/man/man1/gi-decompile-typelib.1\*
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/man/man1/gi-inspect-typelib.1\*
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/man/man1/gobject-query.1\*
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/man/man1/gtester-report.1\*
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/man/man1/gtester.1\*
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/man/man1/gdbus-codegen.1\*
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/man/man1/glib-compile-resources.1\*
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/man/man1/gresource.1\*
-
-Directory not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/gir-1.0
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/gir-1.0/GIRepository-3.0.gir
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/gir-1.0/GLib-2.0.gir
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/gir-1.0/GLibUnix-2.0.gir
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/gir-1.0/GModule-2.0.gir
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/gir-1.0/GObject-2.0.gir
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/gir-1.0/Gio-2.0.gir
-
-File not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/gir-1.0/GioUnix-2.0.gir
-
+File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/man/man1/glib-genmarshal.1*
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/man/man1/glib-gettextize.1*
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/man/man1/glib-mkenums.1*
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/man/man1/gi-compile-repository.1*
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/man/man1/gi-decompile-typelib.1*
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/man/man1/gi-inspect-typelib.1*
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/man/man1/gobject-query.1*
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/man/man1/gtester-report.1*
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/man/man1/gtester.1*
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/man/man1/gdbus-codegen.1*
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/man/man1/glib-compile-resources.1*
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/man/man1/gresource.1*
+    Directory not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/gir-1.0
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/gir-1.0/GIRepository-3.0.gir
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/gir-1.0/GLib-2.0.gir
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/gir-1.0/GLibUnix-2.0.gir
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/gir-1.0/GModule-2.0.gir
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/gir-1.0/GObject-2.0.gir
+    File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/gir-1.0/Gio-2.0.gir
+File not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/gir-1.0/GioUnix-2.0.gir
+```
 继续处理缺失的目录
-
-Directory not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/doc/gio-2.0
-
-Directory not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/doc/gio-unix-2.0
-
-Directory not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/doc/girepository-2.0
-
-Directory not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/doc/glib-2.0
-
-Directory not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/doc/glib-unix-2.0
-
-Directory not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/doc/gmodule-2.0
-
-Directory not found:
-/home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64/usr/share/doc/gobject-2.0
-
+```text
+  Directory not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/doc/gio-2.0
+    Directory not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/doc/gio-unix-2.0
+    Directory not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/doc/girepository-2.0
+    Directory not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/doc/glib-2.0
+    Directory not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/doc/glib-unix-2.0
+    Directory not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/doc/gmodule-2.0
+Directory not found: /home/rocky/rpmbuild/BUILDROOT/glib2-2.80.4-10.el10~bootstrap.loongarch.loongarch64/usr/share/doc/gobject-2.0
+```
 编译成功，安装四个非debug的包。
 
 ## Cairo 
 
 新版本的cairo,构建方式改成了meson。
 
-先尝试构建一下，看看报什么错。
+先尝试构建一下，看看报什么错
+修改spec文件，需要如下改动：
 
--Dgtk_doc=false
+ * `-Dgtk_doc=false`
 
-去掉gtk-doc/html/cairo
+* 去掉`gtk-doc/html/cairo`
 
 ## gd 
 
-\--nodeps \--nocheck
+编译的时候添加 `--nodeps --nocheck`
 
 ## libcroco 
 
@@ -3671,10 +3573,9 @@ Directory not found:
 新版的graphite2已经不编译docs了。
 
 ## Python-mako 
-
-rpmbuild \--rebuild /opt/srpms/Packages/python-mako-1.2.3-9.el10.src.rpm
-\--nodeps \--nocheck
-
+```bash
+rpmbuild --rebuild /opt/srpms/Packages/python-mako-1.2.3-9.el10.src.rpm --nodeps --nocheck
+```
 ## gobject-introspection 
 
 正常编译即可。
@@ -3682,10 +3583,10 @@ rpmbuild \--rebuild /opt/srpms/Packages/python-mako-1.2.3-9.el10.src.rpm
 ## Harfbuzz 
 
 这个包也是采用meson编译，缺少gtk-doc,给meson添加参数
-
+```text
 -Ddocs=disabled -Ddoc_tests=false -Dtests=disabled
 -Dintrospection=disabled
-
+```
 ## T1lib 
 
 没有找到源码包。
@@ -3734,23 +3635,23 @@ texlive依赖zziplib，teckit, potrace, javac
 
 正常编译即可。
 
-symlinks
+## symlinks
 
 正常编译即可。
 
-urw-base35-fonts
+## urw-base35-fonts
 
 正常编译即可。
 
-xorg-x11-font-utils
+## xorg-x11-font-utils
 
 正常编译即可。
 
-libidn2
+## libidn2
 
 正常编译即可。
 
-libijs
+## libijs
 
 正常编译即可。
 
@@ -3764,7 +3665,11 @@ libijs
 
 ## google-droid-font 
 
+正常编译即可。
+
 ## libsigsegv 
+
+正常编译即可。
 
 ## poppler-data 
 
@@ -3772,116 +3677,140 @@ libijs
 
 ## poppler 
 
-依赖Gpgmepp。不想要这个，直接关掉。SPEC文件中添加-DENABLE_GPGME=OFF
+依赖Gpgmepp。不想要这个，直接关掉。SPEC文件中添加`-DENABLE_GPGME=OFF`
 
-目前没有编译任何Qt相关的包，Qt也关掉。rpmbuild 添加 \--without qt
+目前没有编译任何Qt相关的包，Qt也关掉。rpmbuild 添加 `--without qt`
 
-找不到curl，先关掉。
-
+找不到curl，先关掉。需要在spec文件中做如下修改：
+```text
 -DENABLE_GTK_DOC=OFF \\
-
 -DENABLE_GPGME=OFF \\
-
 -DENABLE_LIBCURL=OFF \\
-
 -DENABLE_GOBJECT_INTROSPECTION=OFF \\
+```
 
-rpmbuild -bb rpmbuild/SPECS/poppler.spec \--nodeps \--nocheck \--without
-qt
+编译脚本
 
-ZZiplib
+```bash
+rpmbuild -bb rpmbuild/SPECS/poppler.spec  --nodeps --nocheck --without qt
+```
+## ZZiplib
 
 已经安装了
 
-Teckit
+## Teckit
 
 已经安装
 
-FFCall
+## FFCall
 
 找不到
 
-clisp
+## clisp
 
 找不到。
 
-Potrace
+## Potrace
 
 已经安装。
 
-perl-devel-checklib
+## perl-devel-checklib
 
-perl-XML-parser
+正常编译即可。
+## perl-XML-parser
 
-perl-XML-XPath
+正常编译即可。
+## perl-XML-XPath
 
-texlive-base
+正常编译即可。
+## texlive-base
 
 找不到。
 
-gawk
+## gawk
 
-groff
+正常编译即可。
+## groff
 
-Xapian-core
+正常编译即可。
+## Xapian-core
 
-QPdf
+正常编译即可。
+## QPdf
 
 修改CMake的设置
-
+```text
 -DREQUIRE_CRYPTO_GNUTLS=0\\
-
 -DALLOW_CRYPTO_NATIVE=1 \\
-
 -DREQUIRE_CRYPTO_NATIVE=1 \\
+```
+## TK
 
-TK
+正常编译即可。
 
-Graphviz
-
-rpmbuild -bb \~/rpmbuild/SPECS/graphviz.spec \--without php \--without
-ocaml \--nodeps
-
-Doxygen
+## Graphviz
+编译脚本
+```bash
+rpmbuild -bb ~/rpmbuild/SPECS/graphviz.spec --without php --without ocaml --nodeps
+```
+## Doxygen
 
 rpmbuild -bb rpmbuild/SPECS/doxygen.spec \--define \"\_module_build 1\"
 \--nodeps \--nocheck
 
-symlinks
+## symlinks
 
 已经安装。
 
-asciidoc
+## asciidoc
 
-opensp
+ 正常编译即可。
 
-openjade
+## opensp
 
-linuxdoc-tools
+正常编译即可。
 
-elinks
+## openjade
 
-python3-libxml2
+正常编译即可。
+
+## linuxdoc-tools
+
+正常编译即可。
+
+## elinks
+
+正常编译即可。
+
+## python3-libxml2
 
 重新编译。注意，使用重新打包的libxml2。
 
-itstool
+## itstool
 
-docbook-style-dssl
+正常编译即可。
+## docbook-style-dssl
 
-perl-sgmlspm
+正常编译即可。
+## perl-sgmlspm
 
-dockbook-utils
+正常编译即可。
+## dockbook-utils
 
-docbook5-style-xsl
+正常编译即可。
+## docbook5-style-xsl
 
-oniguruma
+正常编译即可。
+## oniguruma
 
-slang
+正常编译即可。
+## slang
 
-telnet
+正常编译即可。
+## telnet
 
-lynx
+正常编译即可。
+## lynx
 
 依赖telnet,补上。
 
