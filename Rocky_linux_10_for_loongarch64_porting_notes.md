@@ -750,6 +750,7 @@ ls /tools/lib64/libsepol.*
 ```bash
 ls /tools/lib64/libselinux.*
 ```
+
 输出：
 ```text
 /tools/lib64/libselinux.a /tools/lib64/libselinux.so
@@ -3814,232 +3815,297 @@ rpmbuild -bb rpmbuild/SPECS/doxygen.spec \--define \"\_module_build 1\"
 
 依赖telnet,补上。
 
-words
+## words
 
-cracklib
+正常编译即可。
 
-libtirpc
+## cracklib
 
-libnsl2
+正常编译即可。
 
-找不到源码包。
+## libtirpc
 
-libyaml
+正常编译即可。
 
-procps-ng
-
-which
-
-checksec
+## libnsl2
 
 找不到源码包。
 
-rubypick
+## libyaml
+
+正常编译即可。
+
+## procps-ng
+
+正常编译即可。
+
+## which
+
+正常编译即可。
+
+## checksec
 
 找不到源码包。
 
-ruby
+## rubypick
+
+找不到源码包。
+
+## ruby
 
 测试的时候，关于TZ的很多测试会失败。
+```bash
+rpmbuild --rebuild /home/rocky/rpmbuild/SRPMS/ruby-3.3.10-12.el10\~bootstrap.loongarch.src.rpm --without systemtap --define "with_hardening_test 0" --nodeps --nocheck
+```
 
-rpmbuild \--rebuild
-/home/rocky/rpmbuild/SRPMS/ruby-3.3.10-12.el10\~bootstrap.loongarch.src.rpm
-\--without systemtap \--define \"with_hardening_test 0\" \--nodeps
-\--nocheck
+## libselinux
 
-libselinux
+正常编译即可。
 
-libcap-ng
+## libcap-ng
 
-pam
+正常编译即可。
+
+## pam
 
 需要解一下依赖关系。
 
-修改spec文件，将\--enable-audit 改为\--disable-audit
+修改spec文件，将`--enable-audit` 改为`--disable-audit`
 
-在安装文档的时候，去掉adg mwg sag 的txt文件。
+在安装文档的时候，去掉adg mwg sag 的txt文件。 编译脚本：
+```bash
+rpmbuild -bb rpmbuild/SPECS/pam.spec --define '_unpackaged_files_terminate_build 0' --nodeps
+```
 
-rpmbuild -bb rpmbuild/SPECS/pam.spec \--define
-\'\_unpackaged_files_terminate_build 0\' \--nodeps
+## libpwquality
 
-libpwquality
+正常编译即可。
 
-audit
+## audit
 
-rpmbuild -bb rpmbuild/SPECS/audit.spec \--nodeps \--define
-\'\_unpackaged_files_terminate_build 0\'
+编译脚本
+```bash
+rpmbuild -bb rpmbuild/SPECS/audit.spec --nodeps --define '_unpackaged_files_terminate_build 0'
+```
+## lmdb
 
-lmdb
+正常编译即可。
 
-popt
+## popt
 
-libuser
+正常编译即可。
+
+## libuser
 
 需要使用gtk-doc中的gtkdocize命令。先跳过这个，直接编译。
 
 spec文件中，添加
 
-sed -i \"s/gtkdocize/#gtkdocize/g\" autogen.sh
+```bash
+sed -i "s/gtkdocize/#gtkdocize/g" autogen.sh
+```
 
-\--enable-gtk-doc改为\--disable-gtk-doc
+`--enable-gtk-doc`改为`--disable-gtk-doc`
 
-去掉\--html-doc的语句
+去掉`--html-doc`的语句
 
-修改docs/reference/Makefile.am,
-去掉有关gtk-doc.make的语句，去掉ENABLE_GTK_DOC相关的判断。
+修改`docs/reference/Makefile.am`,
+去掉有关`gtk-doc.make`的语句，去掉`ENABLE_GTK_DOC`相关的判断。
 
-libsemanage
+## libsemanage
 
-shadow-utils
+正常编译即可。
 
-libutempter
+## shadow-utils
 
-rubygem-asciidoctor
+正常编译即可。
 
-util-linux
+## libutempter
 
-> 依赖rubygem-asciidoctor，
->
-> 将\--with-udev改为\--without-udev
->
-> \--with-systemd改为\--without-systemd
+正常编译即可。
 
-libev
+## rubygem-asciidoctor
 
-libevent
+正常编译即可。
 
-libverto
+## util-linux
 
-fuse
+依赖`rubygem-asciidoctor`
 
-e2fsprogs
+将`--with-udev`改为`--without-udev`, `--with-systemd`改为`--without-systemd`
 
-添加-D_FILE_OFFSET_BITS=64
+## libev
 
-keyutils
+正常编译即可。
 
-krb5
+## libevent
+
+正常编译即可。
+
+## libverto
+
+正常编译即可。
+
+## fuse
+
+正常编译即可。
+
+## e2fsprogs
+
+添加`-D_FILE_OFFSET_BITS=64`
+
+## keyutils
+
+正常编译即可。
+
+## krb5
 
 依赖libcom_err ,这个包由e2fsprogs 提供。
 
-libksba
+## libksba
 
-libassuan
+正常编译即可。
 
-npth
+## libassuan
 
-json-c
+正常编译即可。
 
-gnupg2
+## npth
 
-> 修改SPEC文件，去掉对tpm2-tss的依赖
->
-> 不产生dirmngr文件和dirmngr-client文件
+正常编译即可。
 
-python-setuptools_scm
+## json-c
 
-> 添加 \--nodeps \--nocheck参数
+正常编译即可。
 
-python3-pluggy
+## gnupg2
 
-python-iniconfig
+修改SPEC文件，去掉对`tpm2-tss`的依赖
 
-libtasn1
+不产生dirmngr文件和dirmngr-client文件
 
-libcap
+## python-setuptools_scm
 
-bash-completion
+添加 `--nodeps --nocheck` 参数
 
-newt
+## python3-pluggy
 
-beakerlib
+正常编译即可。
 
-> 找不到安装包。
+## python-iniconfig
 
-chkconfig
+正常编译即可。
 
-> rpmbuild -bb rpmbuild/SPECS/chkconfig.spec \--nodeps \--define
-> \'\_unpackaged_files_terminate_build 0\'
+## libtasn1
 
-p11-kit
+正常编译即可。
 
-> 完成
+## libcap
 
-fipscheck
+正常编译即可。
 
-> 找不到安装包。
+## bash-completion
 
-nettle
+正常编译即可。
 
-> 完成
+## newt
 
-ca-certificates
+正常编译即可。
 
-完成
+## beakerlib
 
-libunistring
-
-完成
-
-gc
-
-> 找不到安装包。
-
-guile
-
-> 找不到安装包。
-
-autogen\
 找不到安装包。
 
-trousers
+## chkconfig
 
-> 找不到安装包。
+编译脚本
+```bash
+rpmbuild -bb rpmbuild/SPECS/chkconfig.spec --nodeps  --define '_unpackaged_files_terminate_build 0'
+```
+## p11-kit
 
-下决心，补上gtk-doc包。
+ 完成
 
-pytest
+## fipscheck
 
-> rpmbuild \--rebuild /opt/srpms/Packages/pytest-7.4.3-5.el10.src.rpm
-> \--without tests \--without timeout \--without docs \--nocheck
->
-> 如果遇到
->
-> FileExistsError: %pyproject_install has found more than one \*.dist-info/RECORD file. Currently, %pyproject_save_files supports only one wheel → one file list mapping. Feel free to open a bugzilla for pyproject-rpm-macros and describe your usecase.
-> error: Bad exit status from /var/tmp/rpm-tmp.FVnBBF (%install)
->
-> 这样的错误，把rpmbuild BUILD,
-> BUILDROOT文件夹中，有关pytest的内容全部删掉，再编译。
+ 找不到安装包。
 
-cython
+## nettle
 
-> rpmbuild \--rebuild /opt/srpms/Packages/Cython-3.0.9-8.el10.src.rpm
-> \--nodeps
+正常编译即可。
 
-python-lxml
+## ca-certificates
 
-> 用root 编译
+正常编译即可。
 
-python-pathspec
+## libunistring
 
-完成
+正常编译即可。
 
-python-trove-classifiers
+## gc
 
-完成
+找不到安装包。
 
-python-hatchling
+## guile
 
-完成
+找不到安装包。
 
-python-pygments
+## autogen
 
-完成
+找不到安装包。
 
-gtk-doc
+## trousers
 
-rpmbuild \--rebuild /opt/srpms/Packages/gtk-doc-1.33.2-12.el10.src.rpm
-\--nodeps
+找不到安装包。
+
+## pytest
+
+下决心，补上gtk-doc这个很基础的包。一点点补上依赖关系。
+
+```bash
+rpmbuild --rebuild /opt/srpms/Packages/pytest-7.4.3-5.el10.src.rpm --without tests --without timeout --without docs --nocheck
+```
+遇到了这样的错误:
+```text
+ FileExistsError: %pyproject_install has found more than one *.dist-info/RECORD file. Currently, %pyproject_save_files supports only one wheel → one file list mapping. Feel free to open a bugzilla for pyproject-rpm-macros and describe your usecase.
+ error: Bad exit status from /var/tmp/rpm-tmp.FVnBBF (%install)
+```
+
+解决方案： 
+
+把`~/rpmbuild/BUILD`,`~/rpmbuild/BUILDROOT`文件夹中，有关pytest的内容全部删掉，再重新编译。
+
+## cython
+
+```bash
+ rpmbuild --rebuild /opt/srpms/Packages/Cython-3.0.9-8.el10.src.rpm --nodeps
+```
+## python-lxml
+
+ 用root 编译
+
+## python-pathspec
+
+正常编译即可。
+
+## python-trove-classifiers
+
+正常编译即可。
+
+## python-hatchling
+
+正常编译即可。
+
+## python-pygments
+
+正常编译即可。
+
+## gtk-doc
+
+```bash
+rpmbuild --rebuild /opt/srpms/Packages/gtk-doc-1.33.2-12.el10.src.rpm --nodeps
+```
+# 异常处理
 
 忽然无法登陆了，输入密码以后显示login incorrect
 
@@ -4167,7 +4233,7 @@ util-linux
 
 ima-evm-utils
 
-完成
+正常编译即可。
 
 elfutils
 
@@ -4186,11 +4252,11 @@ strace
 
 tss2
 
-完成
+正常编译即可。
 
 tpm2-tss
 
-完成
+正常编译即可。
 
 gnutls
 
@@ -4230,43 +4296,43 @@ cyrus-sasl
 
 unixodbc
 
-完成。
+正常编译即可。。
 
 openldap
 
-完成。
+正常编译即可。。
 
 stunnel
 
-完成。
+正常编译即可。。
 
 byacc
 
-完成。
+正常编译即可。。
 
 checkpolicy
 
-完成。
+正常编译即可。。
 
 sharutils
 
-完成。
+正常编译即可。。
 
 libarchive
 
-完成。
+正常编译即可。。
 
 Brotli
 
-完成。
+正常编译即可。。
 
 Cmocka
 
-完成。
+正常编译即可。。
 
 ducktape
 
-完成。
+正常编译即可。。
 
 polkit
 
@@ -4314,7 +4380,7 @@ softhsm
 
 pkcs11-provider
 
-完成
+正常编译即可。
 
 libssh
 
@@ -4385,15 +4451,15 @@ libidn2
 
 publicsuffix-list
 
-完成
+正常编译即可。
 
 libpsl
 
-完成
+正常编译即可。
 
 curl
 
-完成
+正常编译即可。
 
 jq
 
@@ -4402,7 +4468,7 @@ QA_RPATHS=\$(( 0x0002\|0x0010 )) rpmbuild \--rebuild
 
 socat
 
-完成
+正常编译即可。
 
 elfutils
 
@@ -4414,31 +4480,31 @@ elfutils
 
 tss2
 
-完成
+正常编译即可。
 
 ima-evm-utils
 
-完成
+正常编译即可。
 
 autoconf-archive
 
-完成
+正常编译即可。
 
 python3-mallard-ducktype
 
-完成
+正常编译即可。
 
 yelp-xsl
 
-完成
+正常编译即可。
 
 yelp-tools
 
-完成
+正常编译即可。
 
 mallard-rng
 
-完成
+正常编译即可。
 
 dbus
 
@@ -4465,11 +4531,11 @@ Installed (but unpackaged) file(s) found:
 
 crontabs
 
-完成
+正常编译即可。
 
 cronie
 
-完成
+正常编译即可。
 
 logrotate
 
@@ -4522,7 +4588,7 @@ rpm的一个插件不太好用，暂时禁用这个插件，给它改个名字
 
 perl-generators
 
-完成
+正常编译即可。
 
 redhat-rpm-config
 
@@ -4530,11 +4596,11 @@ redhat-rpm-config
 
 python-rpm-generators
 
-完成
+正常编译即可。
 
 fonts-rpm-macros
 
-完成
+正常编译即可。
 
 ruby
 
@@ -4568,7 +4634,7 @@ fi
 
 lua
 
-完成
+正常编译即可。
 
 dwz
 
@@ -4580,35 +4646,35 @@ dwz
 
 babeltrace
 
-完成
+正常编译即可。
 
 xxhash
 
-完成
+正常编译即可。
 
 gdb
 
-完成
+正常编译即可。
 
 kmod
 
-完成
+正常编译即可。
 
 libaio
 
-完成
+正常编译即可。
 
 libqb
 
-完成
+正常编译即可。
 
 libnl3
 
-完成
+正常编译即可。
 
 kronosnet
 
-完成
+正常编译即可。
 
 corosync
 
@@ -4644,7 +4710,7 @@ sed -i \"s@/tools/@/usr/@g\" macros.systemd
 
 json-c
 
-完成
+正常编译即可。
 
 argon2
 
@@ -4667,7 +4733,7 @@ rpmbuild -bb rpmbuild/SPECS/cryptsetup.spec \--define \"version_no_tilde
 
 libpcap
 
-完成
+正常编译即可。
 
 libmnl
 
@@ -4680,19 +4746,19 @@ rpmbuild \--rebuild /opt/srpms/Packages/libmnl-1.0.5-7.el10.src.rpm
 
 libnftnl
 
-完成
+正常编译即可。
 
 libnfnetlink
 
-完成
+正常编译即可。
 
 libnetfilter_conntrack
 
-完成
+正常编译即可。
 
 iptables
 
-完成
+正常编译即可。
 
 qrencode
 
@@ -4700,7 +4766,7 @@ qrencode
 
 libxkbfile
 
-完成
+正常编译即可。
 
 xorg-x11-xkb-utils
 
@@ -4729,11 +4795,11 @@ kbd
 
 libbpf
 
-完成
+正常编译即可。
 
 python-docutils
 
-完成
+正常编译即可。
 
 bpftool
 
@@ -4753,11 +4819,11 @@ libcbor
 
 python-markupsafe
 
-完成。
+正常编译即可。。
 
 python-jinja2
 
-完成
+正常编译即可。
 
 systemd
 
@@ -4792,19 +4858,19 @@ rpmbuild -bb rpmbuild/SPECS/systemd.spec \--define \"version_no_tilde
 
 dbus-broker
 
-完成
+正常编译即可。
 
 dbus
 
-完成
+正常编译即可。
 
 ipset
 
-完成
+正常编译即可。
 
 intltools
 
-完成。
+正常编译即可。。
 
 jansson
 
@@ -4847,7 +4913,7 @@ xaw3d
 
 vala
 
-完成
+正常编译即可。
 
 libsecret
 
@@ -4887,7 +4953,7 @@ gobject-introspection
 
 shared-mime-info
 
-完成。
+正常编译即可。。
 
 glib2
 
@@ -4911,15 +4977,15 @@ glib2-2.80.4-10.el10\~bootstrap.loongarch.loongarch64 需要
 
 perl-error
 
-完成
+正常编译即可。
 
 perl-termreadkey
 
-完成
+正常编译即可。
 
 xorg-x11-xauth
 
-完成。
+正常编译即可。。
 
 libusbx
 
@@ -4931,7 +4997,7 @@ hidapi
 
 libcbor
 
-完成。
+正常编译即可。。
 
 libfido2
 
@@ -5103,11 +5169,11 @@ rpmbuild -bb rpmbuild/SPECS/tzdata.spec \--nodeps
 
 bc
 
-完成。
+正常编译即可。。
 
 dwarves
 
-完成。
+正常编译即可。。
 
 libical
 
@@ -6402,7 +6468,7 @@ rpmbuild -ba -D \"with_dyninst 0\" -D \"with_java 0\" -D \"with_virthost
 
 yelp-xsl
 
-完成
+正常编译即可。
 
 mallard-rng
 
