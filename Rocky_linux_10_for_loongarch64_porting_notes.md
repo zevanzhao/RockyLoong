@@ -2050,7 +2050,7 @@ undefined symbol start.
 
 ## 虚拟机的配置
 
-后续的移植，将在虚拟机中完成。
+后续的移植，都将在虚拟机中完成。我的编译机是一台采用龙芯3A6000M（2.0GHz）的笔记本电脑，只有4核8线程。我给虚拟分配了3个处理器核。
 
 - 设置fstab
 
@@ -4118,51 +4118,41 @@ rpmbuild --rebuild /opt/srpms/Packages/gtk-doc-1.33.2-12.el10.src.rpm --nodeps
 ```
 # 异常处理
 
-忽然无法登陆了，输入密码以后显示login incorrect
+在编译的过程中，我关闭过虚拟机，重启以后虚拟机就无法登陆了，输入密码以后显示login incorrect。
 
 直接挂载qcow2文件，chroot进去，查看日志
 
 /tools/bin/journalctl
 
-看到这三行
-
-May 04 13:53:45 RockyLoong (agetty)\[410\]: console-getty.service:
-Executing: /sbin/agetty -o \"\-- \\\\u\" \--noreset \--noclear
-\--keep-baud 115200,57600\>
-
-May 04 13:53:45 RockyLoong systemd\[1\]: Got handoff timestamp event for
-PID 410.
-
-May 04 13:53:49 RockyLoong login\[410\]: PAM \_pam_load_conf_file:
-unable to open config for postlogin
-
-May 04 13:53:49 RockyLoong login\[410\]: PAM \_pam_load_conf_file:
-unable to open config for postlogin
-
-May 04 13:53:55 RockyLoong login\[410\]: FAILED LOGIN 1 FROM console FOR
-rocky, Authentication failure
-
+看到这些报错：
+```text
+May 04 13:53:45 RockyLoong (agetty)[410]: console-getty.service: Executing: /sbin/agetty -o "-- \\u" --noreset --noclear --keep-baud 115200,57600>
+May 04 13:53:45 RockyLoong systemd[1]: Got handoff timestamp event for PID 410.
+May 04 13:53:49 RockyLoong login[410]: PAM _pam_load_conf_file: unable to open config for postlogin
+May 04 13:53:49 RockyLoong login[410]: PAM _pam_load_conf_file: unable to open config for postlogin
+May 04 13:53:55 RockyLoong login[410]: FAILED LOGIN 1 FROM console FOR rocky, Authentication failure
+```
 经过检索以及大模型分析，确认是缺少/etc/pam.d/postlogin文件。
 
 补上这个文件，再试一试。
 
-\# 进入 chroot 后执行
-
-cat \<\<EOF \> /etc/pam.d/postlogin
-
-#%PAM-1.0
-
-session optional pam_umask.so
-
-session optional pam_lastlog.so nowtmp
-
+使用chroot, 进入已经挂载的qcow2镜像内， 后执行
+```bash
+cat <<EOF > /etc/pam.d/postlogin 
+#%PAM-1.0 
+session optional pam_umask.so 
+session optional pam_lastlog.so nowtmp 
 EOF
+```
 
-补上这个文件以后，passwd程序可以正常运行了，但是登陆还是有问题。再次查看日志。
+补上这个文件以后，passwd程序可以正常运行了，但是登录还是有问题。
 
-需要修复的东西还很多。明天继续。
+请教了孙海勇老师，发现了问题的根源：在编译软件包的过程中，临时系统 /tools/文件夹内的、登录相关的软件包在逐步被新编译出来的rpm包替换掉，但如果只替换了一半，就会发现登录出现问题了。这个问题有两个解决方法：
 
-依赖关系补全的差不多了，把一些软件包重新编译一遍。
+## 方案1
+
+
+
 
 libtirpc
 
